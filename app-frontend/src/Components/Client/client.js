@@ -6,6 +6,8 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated';
+import { Eye, Search, Trash, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
+
 
 import { Container, Table, Button, Form, Row, Col, InputGroup, ListGroup, Modal, Alert } from 'react-bootstrap';
 
@@ -14,7 +16,6 @@ export default function Client(){
     /* ===== FORM VALIDATION ===== */
 
     const validatePhone = (phone) => {
-        console.log(phone);
         if(/^\d{10,15}$/.test(phone)){ return true; }
         setValidationErrorOnAdd(validationErrorMessages['Phone']);
         return false;
@@ -112,23 +113,19 @@ export default function Client(){
 
     const handleAddContactSelectChange = (selectedOption) => {
         const selectedContacts = selectedOption.map(obj => obj.value);
-
         setAddContactList(selectedContacts);
-        console.log("Selected value:", selectedContacts);
     };
 
     const handleAddClient = (e) =>{
         e.preventDefault();
 
         setValidationErrorOnAdd('');
-        console.log(addClientValues);
         if(validatePhone(addClientValues.phone) && validateZipCode(addClientValues.zip)){
             ClientService.addClient(addClientValues, addContactList)
             .then((response)=>{
                     setClientListUpdated(true);
                     setShowAddForm(false);
                     setSuccessMessage("Client successfully added.");
-                    console.log("Client added: ", response.data);
                 })
                 .catch(error=>{
                     // something went wrong alert
@@ -141,19 +138,14 @@ export default function Client(){
 
     // edit handlers
     const handleShowEditForm = (client) => {
-        console.log("STATECITY", editPrefill.state);
         setShowEditForm(true);
         setShowAddForm(false);
         setEditPrefill(client);
-        console.log("Row data:", client);
         let filteredData = [];
         ContactService.getAssociatedContacts(client.clientId)
             .then(function (response) {
                 const a_ContactsData = response.data;
-                console.log(a_ContactsData);
-                console.log("Data:", a_ContactsData);
                 a_ContactsData.map(Contact => filteredData.push({'value': Contact['personId'], 'label': Contact['firstName'] + " " + Contact['lastName']}));
-                console.log("Associated:", filteredData);
 
                 setAssociatedContacts(filteredData);
             })  
@@ -175,30 +167,24 @@ export default function Client(){
 
     const handleEditAddContactSelectChange = (selectedOption) => {
         const selectedContacts = selectedOption.map(obj => obj.value);
-
         setEditAddContactList(selectedContacts);
-        console.log("Add Selected value:", selectedContacts);
     };
 
     const handleEditDeleteContactSelectChange = (selectedOption) => {
         const selectedContacts = selectedOption.map(obj => obj.value);
-
         setEditDeleteContactList(selectedContacts);
-        console.log("Delete Selected value:", selectedOption);
     };
 
     const handleEditClient = (e) =>{
         e.preventDefault();
         setValidationErrorOnEdit('');
-        console.log("HERE: ", editPrefill);
-        console.log("Valid: ", validatePhone(editPrefill.phone) && validateZipCode(editPrefill.zipCode));
+
         if(validatePhone(editPrefill.phone) && validateZipCode(editPrefill.zipCode)){
             ClientService.editClient(editPrefill, editAddContactList, editDeleteContactList)
             .then((response)=>{
                     setClientListUpdated(true);
                     setShowEditForm(false);
                     setSuccessMessage("Client successfully edited.");
-                    console.log("Client edited: ", response.data);
                 }).catch(error=>{
                     // something went wrong alert
                     setValidationErrorOnEdit("Internal Server Error.");
@@ -217,16 +203,14 @@ export default function Client(){
                 let filteredViewData = [];
 
                 const a_ContactsData = response.data;
-                console.log(a_ContactsData);
-                console.log("Data:", a_ContactsData);
                 a_ContactsData.map(Contact => filteredViewData.push({'value': Contact['personId'], 'label': Contact['firstName'] + " " + Contact['lastName']}));
-                console.log("View Associated:", filteredViewData);
 
                 setAssociatedContactsView(filteredViewData);
             })  
             .catch(function (error) {
                 setValidationErrorOnEdit("Internal Server Error.");
-                console.log(error);            }) 
+                console.log(error);            
+            }) 
     }
     
 
@@ -240,13 +224,13 @@ export default function Client(){
                 label: 'Confirm Delete',
                 onClick: () => {
                     ClientService.deleteClient(clientId)
-                        .then((response)=>{ 
+                        .then(()=>{ 
                             setClientListUpdated(true);
                             setSuccessMessage("Client successfully deleted.");
                         }).catch(error=>{
                             setDeleteFailed(true);
                             setErrorMessageOnDelete("Internal Server Error.")
-                            console.log("Client delete failed.");
+                            console.log(error);
                         })
                     }
                 }
@@ -288,12 +272,10 @@ export default function Client(){
 
     useEffect(()=>{
         let filteredData = [];
-        console.log("HERE");
         ContactService.getUnassociatedContacts()
             .then(function (response) {
                 const data = response.data;
                 data.map(Contact => filteredData.push({'value': Contact['personId'], 'label': Contact['firstName'] + " " + Contact['lastName']}));
-                console.log("Unassociated:", filteredData);
                 setUnassociatedContacts(filteredData);
             })  
             .catch(function (error) {
@@ -306,6 +288,8 @@ export default function Client(){
     
     return(
         <Container className="mt-4"> 
+
+            <h3 className="text-center"><b>Clients</b></h3>
 
             {/* ===== COMPONENT ALERTS ===== */}
 
@@ -349,13 +333,13 @@ export default function Client(){
             <Form onSubmit={handleSearchSubmit}>
                 <InputGroup className="mb-3">
                     <Form.Control
-                        placeholder="Search by email..."
+                        placeholder="Search by name..."
                         aria-label="Search"
                         value={searchText}
                         onChange={handleSearchInputChange}
                     />
                     <Button variant="outline-secondary" type="submit">
-                        Search
+                        <Search/>{' '}Search
                     </Button>
                 </InputGroup>
             </Form>
@@ -411,28 +395,28 @@ export default function Client(){
                         </div>
                         <Form onSubmit={handleAddClient}>
                             <Row>
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                     <Form.Control type="text" name="name" placeholder="Name" value={addClientValues.name} onChange={handleAddInputChange} required/>
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Phone <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Phone <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="phone" placeholder="Phone" value={addClientValues.phone} onChange={handleAddInputChange} required/>
                                     </Col>                            
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Website URI <span className="text-danger">*</span></Form.Label>
-                                <Col sm={6}>
-                                    <Form.Control type="url" name="website" placeholder="Website URI" value={addClientValues.website} onChange={handleAddInputChange} required/>
-                                </Col>
+                                <Form.Group as={Row} className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Website URI <span className="text-danger">*</span></Form.Label>
+                                    <Col sm={6}>
+                                        <Form.Control type="url" name="website" placeholder="Website URI" value={addClientValues.website} onChange={handleAddInputChange} required/>
+                                    </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
+                                <Form.Group as={Row} className="mt-2">
                                     <Form.Label column sm={3}>Add Contact</Form.Label>
                                     <Col sm={6}>
                                         <Select
@@ -446,15 +430,15 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Street Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Street Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                 <Form.Control type="text" name="streetAddress" placeholder="Street Address" value={addClientValues.streetAddress} onChange={handleAddInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>State <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">State <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="state" value={addClientValues.state} onChange={handleAddInputChange} required>
                                             <option value="">Select a State</option>
@@ -467,8 +451,8 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>City <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">City <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="city" value={addClientValues.city} onChange={handleAddInputChange} disabled={addClientValues.state==""} required>
                                             <option value="">Select a City</option>
@@ -482,8 +466,8 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Zip <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Zip <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}><Form.Control type="text" name="zip" placeholder="Zip" value={addClientValues.zip} onChange={handleAddInputChange} required /></Col>
                                 </Form.Group>
                             </Row>
@@ -508,28 +492,28 @@ export default function Client(){
                         </div>
                         <Form onSubmit={handleEditClient}>
                             <Row>
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                     <Form.Control type="text" name="name" placeholder="Name" value={editPrefill.name} onChange={handleEditInputChange} required/>
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Phone <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Phone <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="phone" placeholder="Phone" value={editPrefill.phone} onChange={handleEditInputChange} required/>
                                     </Col>                            
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Website URI <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Website URI <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                     <Form.Control type="url" name="website" placeholder="Website URI" value={editPrefill.companyURI} onChange={handleEditInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
+                                <Form.Group as={Row}  className="mt-2">
                                     <Form.Label column sm={3}>Add Contact</Form.Label>
                                     <Col sm={6}>
                                         <Select
@@ -543,8 +527,8 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Delete Contact</Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Delete Contact</Form.Label>
                                     <Col sm={6}>
                                         <Select
                                             closeMenuOnSelect={false}
@@ -556,15 +540,15 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Street Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Street Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                 <Form.Control type="text" name="streetAddress" placeholder="Street Address" value={editPrefill.streetAddress} onChange={handleEditInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>State <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">State <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="state" value={editPrefill.state} onChange={handleEditInputChange} required>
                                             <option value="">Select a State</option>
@@ -577,8 +561,8 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>City <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">City <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="city" value={editPrefill.city} onChange={handleEditInputChange} disabled={editPrefill.state==""} required>
                                             <option value="">Select a City</option>
@@ -592,8 +576,8 @@ export default function Client(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Zip <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Zip <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}><Form.Control type="text" name="zip" placeholder="Zip" value={editPrefill.zipCode} onChange={handleEditInputChange} required /></Col>
                                 </Form.Group>
                             </Row>
@@ -612,7 +596,7 @@ export default function Client(){
             <Row className="mb-4" >
                 <Col>
                     <Button variant="primary" onClick={handleShowAddForm}>
-                        New Entry
+                        <PlusCircle/>{' '}New Entry
                     </Button>
                     <Table striped bordered className="mt-4">
                         <thead>
@@ -629,9 +613,9 @@ export default function Client(){
                                         <td>{client['name']}</td>
                                         <td>{client['phone']}</td>
                                         <td className="text-center">
-                                            <Button variant="info" onClick={() => handleShowClient(client)}>View</Button>{' '}
-                                            <Button variant="secondary" onClick={() => handleShowEditForm(client)}>Edit</Button>{' '}
-                                            <Button variant="danger" onClick={() => handleDeleteClient(client.clientId)}>Delete</Button>    
+                                            <Button variant="info" onClick={() => handleShowClient(client)}><Eye/>{' '}<span className="hide-on-small-screen">View</span></Button>{' '}
+                                            <Button variant="secondary" onClick={() => handleShowEditForm(client)}><PencilSquare/>{' '}<span className="hide-on-small-screen">Edit</span></Button>{' '}
+                                            <Button variant="danger" onClick={() => handleDeleteClient(client.clientId)}><Trash/>{' '}<span className="hide-on-small-screen">Delete</span></Button>    
                                         </td>
                                         </tr>
                                     );

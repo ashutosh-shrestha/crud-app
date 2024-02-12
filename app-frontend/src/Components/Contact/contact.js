@@ -5,7 +5,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Container, Table, Button, Form, Row, Col, InputGroup, Alert, Modal } from 'react-bootstrap';
 import { stateCityData } from '../../StateCities';
-
+import { Eye, Search, Trash, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
 
 export default function Contact(){
 
@@ -98,10 +98,8 @@ export default function Contact(){
 
     const handleAddContact = (e) =>{
         e.preventDefault();
-
         setValidationErrorOnAdd('');
-        console.log("HERE");
-        console.log(addContactValues);
+
         if(validateZipCode(addContactValues.zip)){
             ContactService.addContact(addContactValues)
             .then((response)=>{
@@ -109,7 +107,6 @@ export default function Contact(){
                     setShowAddForm(false);
                     setAddContactValues([]);
                     setSuccessMessage("Contact successfully added.");
-                    console.log("Contact added: ", response.data);
                 })
                 .catch(error=>{
                     // something went wrong alert
@@ -124,7 +121,6 @@ export default function Contact(){
         setEditPrefill(contact);
         setShowEditForm(true);
         setShowAddForm(false);
-        console.log("EDIT PREFILL:", contact);
     }
     const handleEditInputChange = (e) => {
         setEditPrefill({
@@ -139,14 +135,12 @@ export default function Contact(){
         e.preventDefault();
 
         setValidationErrorOnEdit('');
-        console.log("HERE: ", editPrefill);
         if(validateZipCode(editPrefill.zipCode)){
             ContactService.editContact(editPrefill)
             .then((response)=>{
                     setContactListUpdated(true);
                     setShowEditForm(false);
                     setSuccessMessage("Contact successfully edited.");
-                    console.log("Contact edited: ", response.data);
                 }).catch(error=>{
                     // something went wrong alert
                     setValidationErrorOnEdit("Internal Server Error.");
@@ -159,11 +153,9 @@ export default function Contact(){
     const handleShowContact = (contact) => {
         setContactDetails(contact);
         setViewContact(true);
-        console.log(contact.clientId);
         if(contact.clientId > 0){
             ClientService.getAssociatedClient(contact.clientId)
             .then(function (response) {
-                console.log(response.data);
                 setAssociatedClientName(response.data.name);
             })  
             .catch(function (error) {
@@ -183,13 +175,13 @@ export default function Contact(){
                 label: 'Confirm Delete',
                 onClick: () => {
                     ContactService.deleteContact(personId)
-                        .then((response)=>{ 
+                        .then(()=>{ 
                             setContactListUpdated(true);
                             setSuccessMessage("Contact successfully deleted.");
                         }).catch(error=>{
                             setDeleteFailed(true);
                             setErrorMessageOnDelete("Internal Server Error.")
-                            console.log("Contact delete failed.");
+                            console.log(error);
                         })
                     }
                 }
@@ -215,7 +207,7 @@ export default function Contact(){
             })
       };
 
-    /* ===== FETCH ON LOAD AND STATE VARIABLE (clientListUpdated) UPDATE ===== */
+    /* ===== FETCH ON LOAD AND STATE VARIABLE (contactListUpdated) UPDATE ===== */
 
     useEffect(()=>{
         ContactService.getContactList()
@@ -229,12 +221,9 @@ export default function Contact(){
             })
     },[contactListUpdated])
 
-    /* ===== FETCH ON LOAD ===== */
-
     useEffect(()=>{
         ClientService.getClientList()
             .then(function (response) {
-                console.log(response.data);
                 setClientList(response.data);
             })  
             .catch(function (error) {
@@ -242,11 +231,13 @@ export default function Contact(){
                 setContactListLoaded(false);
                 setContactListLoadErrorMessage("Error retrieving client from contact.");
             })
-    },[])
+    },[contactListUpdated])
 
     return(
         
         <Container className="mt-4"> 
+
+            <h3 className="text-center"><b>Contacts</b></h3>
 
             {/* ===== COMPONENT ALERTS ===== */}
 
@@ -296,7 +287,7 @@ export default function Contact(){
                         onChange={handleSearchInputChange}
                     />
                     <Button variant="outline-secondary" type="submit">
-                        Search
+                        <Search/> {' '}Search
                     </Button>
                 </InputGroup>
             </Form>
@@ -325,7 +316,7 @@ export default function Contact(){
                         </tr>
                         <tr>
                             <td><b>Associated Client</b></td>
-                            <td>{associatedClientName!=''? associatedClientName:<p>None</p>}</td>
+                            <td>{associatedClientName!=''? associatedClientName:<p>{'None'}</p>}</td>
                         </tr>
                     </tbody>
                 </Table>
@@ -344,50 +335,50 @@ export default function Contact(){
                         </div>
                         <Form onSubmit={handleAddContact}>
                             <Row>
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>First Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">First Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="firstName" placeholder="First Name" value={addContactValues.firstName} onChange={handleAddInputChange} required/>
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Last Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Last Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="lastName" placeholder="Last Name" value={addContactValues.lastName} onChange={handleAddInputChange} required/>
                                     </Col>                            
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
+                                <Form.Group as={Row}  className="mt-2">
                                 <Form.Label column sm={3}>Associate a Client</Form.Label>
                                 <Col sm={6}>
                                     <Form.Control as="select" name="clientId" value={addContactValues.clientId} onChange={handleAddInputChange}required>
-                                            <option value="-1">No Selection</option>
-                                            {Object.values(clientList).length !== 0 && Object.values(clientList).map((client) => (
-                                                <option value={client.clientId}>
-                                                {client.name}
-                                                </option>
-                                            ))}
-                                        </Form.Control>
+                                        <option value="-1">No Selection</option>
+                                        {Object.values(clientList).length !== 0 && Object.values(clientList).map((client, index) => (
+                                            <option key={index} value={client.clientId}>
+                                            {client.name}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Email Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Email Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                     <Form.Control type="email" name="email" placeholder="Email Address" value={addContactValues.email} onChange={handleAddInputChange}required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Street Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Street Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                     <Form.Control type="text" name="streetAddress" placeholder="Street Address" value={addContactValues.streetAddress} onChange={handleAddInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>State <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">State <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="state" value={addContactValues.state} onChange={handleAddInputChange} required>
                                             <option value="">Select a State</option>
@@ -400,8 +391,8 @@ export default function Contact(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>City <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">City <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="city" value={addContactValues.city} onChange={handleAddInputChange} disabled={addContactValues.state==""} required>
                                         <option value="">Select a City</option>
@@ -415,8 +406,8 @@ export default function Contact(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Zip <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Zip <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}><Form.Control type="text" name="zip" placeholder="Zip" value={addContactValues.zip} onChange={handleAddInputChange} required/></Col>
                                 </Form.Group>
                             </Row>
@@ -441,21 +432,21 @@ export default function Contact(){
                         </div>
                         <Form onSubmit={handleEditContact}>
                         <Row>
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>First Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">First Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="firstName" placeholder="First Name" value={editPrefill.firstName} onChange={handleEditInputChange} required/>
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Last Name <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Last Name <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control type="text" name="lastName" placeholder="Last Name" value={editPrefill.lastName} onChange={handleEditInputChange} required/>
                                     </Col>                            
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
+                                <Form.Group as={Row}  className="mt-2">
                                 <Form.Label column sm={3}>Associate a Client</Form.Label>
                                 <Col sm={6}>
                                     <Form.Control as="select" name="clientId" value={editPrefill.clientId} onChange={handleEditInputChange}required>
@@ -469,22 +460,22 @@ export default function Contact(){
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Email Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Email Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                     <Form.Control type="email" name="email" placeholder="Email Address" value={editPrefill.emailAddress} onChange={handleEditInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                <Form.Label column sm={3}>Street Address <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                <Form.Label column sm={3} className="hide-on-small-screen">Street Address <span className="text-danger">*</span></Form.Label>
                                 <Col sm={6}>
                                     <Form.Control type="text" name="streetAddress" placeholder="Street Address" value={editPrefill.streetAddress} onChange={handleEditInputChange} required/>
                                 </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>State <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">State <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="state" value={editPrefill.state} onChange={handleEditInputChange} required>
                                             <option value="">Select a State</option>
@@ -497,8 +488,8 @@ export default function Contact(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>City <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">City <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
                                         <Form.Control as="select" name="city" value={editPrefill.city} onChange={handleEditInputChange} disabled={editPrefill.state==""} required>
                                         <option value="">Select a City</option>
@@ -511,8 +502,8 @@ export default function Contact(){
                                     </Col>
                                 </Form.Group>
 
-                                <Form.Group as={Row}>
-                                    <Form.Label column sm={3}>Zip <span className="text-danger">*</span></Form.Label>
+                                <Form.Group as={Row}  className="mt-2">
+                                    <Form.Label column sm={3} className="hide-on-small-screen">Zip <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}><Form.Control type="text" name="zipCode" placeholder="Zip" value={editPrefill.zipCode} onChange={handleEditInputChange} required/></Col>
                                 </Form.Group>
                             </Row>
@@ -531,14 +522,14 @@ export default function Contact(){
             <Row className="mb-4">
                 <Col>
                     <Button variant="primary" onClick={handleShowAddForm}>
-                        New Entry
+                        <PlusCircle/>{' '}New Entry
                     </Button>
                     <Table striped bordered hover className="mt-4">
                         <thead>
                             <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Action</th>
+                            <th className="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -547,10 +538,10 @@ export default function Contact(){
                                     <tr key={index}>
                                     <td>{contact['firstName'] + " " + contact['lastName']}</td>
                                     <td>{contact['emailAddress']}</td>
-                                    <td>
-                                        <Button variant="info" onClick={() => handleShowContact(contact)}>View</Button>{' '}
-                                        <Button variant="secondary" onClick={() => handleShowEditForm(contact)}>Edit</Button>{' '}
-                                        <Button variant="danger" onClick={() => handleDeleteContact(contact.personId)}>Delete</Button> 
+                                    <td className="text-center">
+                                        <Button variant="info" onClick={() => handleShowContact(contact)}><Eye/>{' '}<span className="hide-on-small-screen">View</span></Button>{' '}
+                                        <Button variant="secondary" onClick={() => handleShowEditForm(contact)}><PencilSquare/>{' '}<span className="hide-on-small-screen">Edit</span></Button>{' '}
+                                        <Button variant="danger" onClick={() => handleDeleteContact(contact.personId)}><Trash/>{' '}<span className="hide-on-small-screen">Delete</span></Button> 
                                     </td>
                                 </tr>
                                 );

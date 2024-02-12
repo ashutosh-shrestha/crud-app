@@ -19,7 +19,7 @@ const Navbar = () => {
   }, [showLinks]);
   return (
     <nav>
-      <div className='nav-center'>
+      <div className='nav-container'>
         <div className='nav-header'>
           <div className='nav-title'>
             <h3>Aquent CRUD App</h3>

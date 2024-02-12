@@ -31,11 +31,6 @@ Variables
   --clr-grey-9: hsl(212, 33%, 89%);
   --clr-grey-10: hsl(210, 36%, 96%);
   --clr-white: #fff;
-  --clr-red-dark: hsl(360, 67%, 44%);
-  --clr-red-light: hsl(360, 71%, 66%);
-  --clr-green-dark: hsl(125, 67%, 44%);
-  --clr-green-light: hsl(125, 71%, 66%);
-  --clr-black: #222;
   --transition: all 0.3s linear;
   --spacing: 0.1rem;
   --radius: 0.25rem;
@@ -76,7 +71,6 @@ h2,
 h3,
 h4 {
   letter-spacing: var(--spacing);
-  text-transform: capitalize;
   line-height: 1.25;
   margin-bottom: 0.75rem;
 }
@@ -133,6 +127,12 @@ p {
     width: 95vw;
   }
 }
+
+@media (max-width: 575px) {
+  .hide-on-small-screen {
+    display: none;
+  }
+}
 /*
 =============== 
 Home
@@ -141,7 +141,7 @@ Home
 .home-text-hello, .home-text-welcome{
   text-align:center;
   width:100%;
-  margin:50px;
+  margin-top:30px;
 }
 .home-text-hello
 {
@@ -162,7 +162,7 @@ Home
   -webkit-text-fill-color: transparent;
   animation: textclip 2s linear infinite;
   display: inline-block;
-  font-size: 100px;
+  font-size: 50px;
 }
 
 .home-text-welcome
@@ -183,7 +183,7 @@ Home
   -webkit-text-fill-color: transparent;
   animation: textclip 2s linear infinite;
   display: inline-block;
-  font-size: 70px;
+  font-size: 50px;
 }
 
 @keyframes textclip {
@@ -196,7 +196,8 @@ Home
 Navbar
 ===============
 */
-nav {
+nav-container {
+  width: 100%;
   background: var(--clr-white);
   box-shadow: var(--light-shadow);
 }
@@ -208,12 +209,6 @@ nav {
 }
 .nav-title{
   font-family: 'Allerta Stencil';
-}
-
-.active-link {
-  color: #3498db; /* Change this color to match your design */
-  font-weight: bold;
-  background-color: black;
 }
 
 .nav-toggle {
@@ -246,6 +241,7 @@ nav {
   padding-left: 1.5rem;
 }
 .links-container {
+  text-align:center;
   height: 0;
   overflow: hidden;
   transition: var(--transition);
@@ -254,8 +250,8 @@ nav {
   height: 10rem;
 }
 @media screen and (min-width: 800px) {
-  .nav-center {
-    max-width: 1170px;
+  .nav-container {
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -282,64 +278,4 @@ nav {
     padding: 0;
     background: transparent;
   }
-}
-/*
-=============== 
-Clients
-===============
-*/
-.table-title{
-  text-align: center;
-  width: 100%;
-  font-family: 'Allerta Stencil';
-  padding: 10px;
-  background: var(--clr-grey-10);
-  line-height: 1.5;
-  font-size: 0.875rem;
-}
-
-.client-container, .contact-container{
-  width: 50%;
-  padding: 50px;
-  margin:0 auto;
-}
-
-.client-title{
-  text-align: center;
-  font-family: 'Gruppo';
-  font-size: 22px;
-}
-
-.client-body{
-  text-align:left;
-  font-family: 'Gruppo';
-  font-size: 22px;
-}
-
-.client-contacts{
-  text-align: center;
-  margin-top: 15px;
-}
-
-.client-name, .contact-name{
-  color: black; 
-  font-family: 'Raleway',sans-serif; 
-  font-size: 20px; 
-  font-weight: 500; 
-  line-height: 50px; 
-  text-align: center; 
-  text-transform: uppercase;
-  border-radius: 20%;
-}
-
-.client-name:hover, .contact-name:hover{
-  background-color: black;
-  font-weight: 600; 
-  color: white; 
-}
-
-
-.icon-btn{
-  margin-left: 5px;
-  margin-right: 5px;
 }
