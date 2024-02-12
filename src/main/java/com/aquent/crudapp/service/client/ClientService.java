@@ -3,7 +3,6 @@ package com.aquent.crudapp.service.client;
 import com.aquent.crudapp.model.client.Client;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,16 +12,11 @@ import java.util.List;
 public interface ClientService {
 
     /**
-     * Retrieves all of the client records.
+     * Retrieves all client records.
      *
-     * @return list of client records
+     * @return List of Client objects
      */
     List<Client> listClient();
-
-    /**
-     * Retrieves client name by person id.
-     */
-    Client getAssociatedClient(Integer clientId);
 
     /**
      * Creates a new client record
@@ -33,28 +27,26 @@ public interface ClientService {
     Integer createClient(Client client);
 
     /**
-     * Updates an existing client record
+     * Reads existing client record
      *
-     * @param clientId the client ID
-     * @return the client ID
+     * @param clientId of the client
+     * @return Client object
      */
     Client readClient(Integer clientId);
 
     /**
      * Updates an existing client record
      *
-     * @param client the new values to save
+     * @param client object with the new values to save
      */
     void updateClient(Client client);
 
     /**
      * Deletes a client record by ID
      *
-     * @param clientId the client ID
+     * @param clientId of the client
      */
     void deleteClient(Integer clientId);
-
-
 
 
     /**
@@ -69,6 +61,18 @@ public interface ClientService {
 
     void deleteContactFromClient(List<Integer> deleteContactData);
 
+    /**
+     * Retrieves client details by client id.
+     *
+     * @return Client object
+     */
+    Client getAssociatedClient(Integer clientId);
+
+    /**
+     * Sends a list of clients whose name match the given search string.
+     *
+     * @return List of Client objects
+     */
     List<Client> findByName(String searchText);
 
 }

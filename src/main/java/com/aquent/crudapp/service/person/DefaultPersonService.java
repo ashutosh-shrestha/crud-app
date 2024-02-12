@@ -80,18 +80,6 @@ public class DefaultPersonService implements PersonService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public int addClientToPerson(Integer personId, Integer clientId) {
-        return personDao.addClientToPerson(personId, clientId);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
-    public int deleteAssociatedClient(Integer personId) {
-        return personDao.deleteAssociatedClient(personId);
-    }
-
-    @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Person> findByEmail(String searchText) {
         return personDao.findByEmail(searchText);

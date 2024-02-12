@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -37,15 +36,14 @@ public class ClientController {
         return clientService.listClient();
     }
 
-
     /**
-     * Sends the client Name by ID.
+     * Validates and saves a new client.
+     * On success, the client name is sent.
+     * On failure, the error code is sent.
+     *
+     * @param clientDto - a populated bean for client data transfer object
+     * @return ResponseEntity with HttpStatus and body
      */
-    @GetMapping(value = "getAssociatedClient")
-    public Client getAssociatedClient(Integer clientId) {
-        return clientService.getAssociatedClient(clientId);
-    }
-
     @PostMapping(value= "create")
     public ResponseEntity<List<String>> create(@RequestBody ClientDto clientDto) {
         Client client = clientDto.getClient();
@@ -66,46 +64,12 @@ public class ClientController {
     }
 
     /**
-     * Sends all list of people.
-     *
-     * @return list of people
-     */
-    //for person edit form
-//    @PatchMapping(value="add-contact")
-//    public ResponseEntity<Boolean> addContactToClient(@RequestBody AddContactData addContactData) {
-//        try {
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(true);
-//        }
-//        catch(NoSuchElementException exp) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
-//        }
-//    }
-//
-//    /**
-//     * Sends all list of people.
-//     *
-//     * @return list of people
-//     */
-//    @PatchMapping(value="delete-contact")
-//    public ResponseEntity<Boolean> deleteContactFromClient(@RequestBody DeleteContactData deleteContactData) {
-//        try {
-//            clientService.deleteContactFromClient(deleteContactData);
-//            return ResponseEntity.status(HttpStatus.OK).body(true);
-//        }
-//        catch(NoSuchElementException exp) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
-//        }
-//    }
-
-
-    /**
      * Validates and saves an edited client.
      * On success, the client name is sent.
-     * On failure, the validation errors are sent.
+     * On failure, the error code sent.
      *
-     * @param client - a populated bean for client
-     * @return client name as single-element list to check in frontend.
+     * @param clientDto - a populated bean for client data transfer object
+     * @return ResponseEntity with HttpStatus and body
      */
     @PutMapping(value = "edit")
     public ResponseEntity<List<String>> edit(@RequestBody ClientDto clientDto) {
@@ -133,9 +97,11 @@ public class ClientController {
 
     /**
      * Handles client deletion
+     * On success, true and success code is sent
+     * On failure, false and error code is sent
      *
      * @param clientId - ID of the client to be deleted
-     * @return true if success, else false
+     * @return ResponseEntity with HttpStatus and body
      */
     @DeleteMapping(value = "delete")
     public ResponseEntity<Boolean> delete(@RequestParam Integer clientId) {
@@ -148,6 +114,23 @@ public class ClientController {
         }
     }
 
+
+    /**
+     * Sends the client detail by clientID.
+     *
+     * @param clientId - ID of the client
+     * @return Client object that holds requested client data
+     */
+    @GetMapping(value = "getAssociatedClient")
+    public Client getAssociatedClient(Integer clientId) {
+        return clientService.getAssociatedClient(clientId);
+    }
+
+    /**
+     * Sends a list of clients whose name match the given search string.
+     *
+     * @return List of Client objects
+     */
     @GetMapping("/search")
     public List<Client> searchByName(@RequestParam String searchText) {
         return clientService.findByName(searchText);

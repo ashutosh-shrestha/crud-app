@@ -77,12 +77,6 @@ public class JdbcClientDao implements ClientDao{
         return namedParameterJdbcTemplate.getJdbcOperations().query(SQL_LIST_CLIENTS, new ClientRowMapper());
     }
 
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Client getAssociatedClient(Integer clientId) {
-        return namedParameterJdbcTemplate.queryForObject(SQL_GET_CLIENT_NAME, Collections.singletonMap("clientId", clientId), new ClientRowMapper());
-    }
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createClient(Client client) {
@@ -118,17 +112,23 @@ public class JdbcClientDao implements ClientDao{
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public int addContactToClient(Integer contactId, Integer clientId) {
+    public void addContactToClient(Integer contactId, Integer clientId) {
         Map mapper = new HashMap();
         mapper.put("contactId", contactId);
         mapper.put("clientId", clientId);
-        return namedParameterJdbcTemplate.update(SQL_ADD_CONTACT_TO_CLIENT, mapper);
+        namedParameterJdbcTemplate.update(SQL_ADD_CONTACT_TO_CLIENT, mapper);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public int deleteContactFromClient(Integer contactId) {
-        return namedParameterJdbcTemplate.update(SQL_DELETE_CONTACT_FROM_CLIENT, Collections.singletonMap("contactId", contactId));
+    public void deleteContactFromClient(Integer contactId) {
+        namedParameterJdbcTemplate.update(SQL_DELETE_CONTACT_FROM_CLIENT, Collections.singletonMap("contactId", contactId));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Client getAssociatedClient(Integer clientId) {
+        return namedParameterJdbcTemplate.queryForObject(SQL_GET_CLIENT_NAME, Collections.singletonMap("clientId", clientId), new ClientRowMapper());
     }
 
     @Override

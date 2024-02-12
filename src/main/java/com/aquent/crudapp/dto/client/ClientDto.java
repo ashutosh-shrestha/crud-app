@@ -5,6 +5,15 @@ import com.aquent.crudapp.model.client.Client;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* Client Data Transfer Object
+*
+* Stores: client object, list of contacts to add, and list of contacts to delete
+* Purpose:
+*       API operations is minimized to a single request when a client makes an Edit
+*       where user adds or deletes or both adds and deletes contacts.
+* */
+
 public class ClientDto {
     private Client client = null;
     private List<Integer> addContactList = new ArrayList<>();

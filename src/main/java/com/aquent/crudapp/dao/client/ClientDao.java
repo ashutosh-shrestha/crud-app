@@ -12,7 +12,7 @@ import java.util.List;
 public interface ClientDao {
 
     /**
-     * Retrieves all of the clients record.
+     * Retrieves all clients record.
      *
      * @return list of client record
      */
@@ -29,25 +29,17 @@ public interface ClientDao {
     /**
      * Retrieves a client record by ID.
      *
-     * @param clientId the client ID
+     * @param clientId of the client
+     * @return Client object
      */
     Client readClient(Integer clientId);
 
     /**
      * Updates an existing client record.
      *
-     * @param client the new values to save
+     * @param client object with new values to save
      */
     void updateClient(Client client);
-
-
-    /**
-     * Retrieves client name by person Id
-     * @param id the person ID
-     */
-    Client getAssociatedClient(Integer personId);
-
-
 
     /**
      * Deletes a client record by ID
@@ -59,17 +51,30 @@ public interface ClientDao {
     /**
      * adds contact to a client
      *
-     * @param - id of the client and person to be associated
+     * @param - clientId of the client and person to be associated
      */
-    int addContactToClient(Integer contactId, Integer clientId);
+    void addContactToClient(Integer contactId, Integer clientId);
 
     /**
      * deletes a contact association from a client
      *
-     * @param - id of the person to be disassociated from their respective client
+     * @param - contactId: ID of the person to be deleted from their respective client
      */
-    int deleteContactFromClient(Integer contactId);
+    void deleteContactFromClient(Integer contactId);
 
+    /**
+     * Retrieves client details of a client associated to a person
+     * @param personId of the person
+     * @retyrb Client object
+     */
+    Client getAssociatedClient(Integer personId);
+
+    /**
+     * Sends a list of clients whose name match the given search string
+     *
+     * @param searchText is the string to lookup
+     * @return List of Client objects
+     */
     List<Client> findByName(String searchText);
 
 }

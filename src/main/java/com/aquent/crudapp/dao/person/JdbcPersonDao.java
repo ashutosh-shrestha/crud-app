@@ -53,15 +53,6 @@ public class JdbcPersonDao implements PersonDao {
     public static final String SQL_LIST_UNASSOCIATED_CONTACTS =
             "SELECT * FROM person " +
                     "WHERE client_id = -1";
-
-    public static final String SQL_UPDATE_CLIENT_IN_PERSON =
-            "UPDATE person " +
-                    "SET client_id = :clientId WHERE person_id = :personId";
-
-    public static final String SQL_DELETE_CLIENT_FROM_PERSON =
-            "UPDATE person " +
-                    "SET client_id = NULL WHERE person_id = :personId";
-
     public static final String SQL_FIND_PERSON_BY_EMAIL =
             "SELECT * FROM person " +
                     "WHERE email_address LIKE :searchText";
@@ -78,16 +69,23 @@ public class JdbcPersonDao implements PersonDao {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Integer createPerson(Person person) {
+        int newId = -1;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        namedParameterJdbcTemplate.update(SQL_CREATE_PERSON, new BeanPropertySqlParameterSource(person), keyHolder);
+        if (keyHolder.getKeys().size() > 1) {
+            newId = (Integer) keyHolder.getKeys().get("person_id");
+        }
+        return newId;
+    }
+
+    @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public Person readPerson(Integer personId) {
         return namedParameterJdbcTemplate.queryForObject(SQL_READ_PERSON, Collections.singletonMap("personId", personId), new PersonRowMapper());
     }
 
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public void deletePerson(Integer personId) {
-        namedParameterJdbcTemplate.update(SQL_DELETE_PERSON, Collections.singletonMap("personId", personId));
-    }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -97,18 +95,9 @@ public class JdbcPersonDao implements PersonDao {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Integer createPerson(Person person) {
-        int newId = -1;
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        namedParameterJdbcTemplate.update(SQL_CREATE_PERSON, new BeanPropertySqlParameterSource(person), keyHolder);
-        if (keyHolder.getKeys().size() > 1) {
-            newId = (Integer)keyHolder.getKeys().get("person_id");
-        }
-        return newId;
+    public void deletePerson(Integer personId) {
+        namedParameterJdbcTemplate.update(SQL_DELETE_PERSON, Collections.singletonMap("personId", personId));
     }
-
-
-
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -120,21 +109,6 @@ public class JdbcPersonDao implements PersonDao {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Person> listUnassociatedContacts() {
         return namedParameterJdbcTemplate.getJdbcOperations().query(SQL_LIST_UNASSOCIATED_CONTACTS, new PersonRowMapper());
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public int addClientToPerson(Integer personId, Integer clientId) {
-        Map mapper = new HashMap();
-        mapper.put("personId", personId);
-        mapper.put("clientId", clientId);
-        return namedParameterJdbcTemplate.update(SQL_UPDATE_CLIENT_IN_PERSON, mapper);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public int deleteAssociatedClient(Integer personId) {
-        return namedParameterJdbcTemplate.update(SQL_DELETE_CLIENT_FROM_PERSON, Collections.singletonMap("personId", personId));
     }
 
     @Override

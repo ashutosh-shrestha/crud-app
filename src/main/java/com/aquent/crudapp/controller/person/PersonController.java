@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -36,48 +35,14 @@ public class PersonController {
         return personService.listPerson();
     }
 
-    /**
-     * Sends all list of people for a client.
-     *
-     * @return list of people
-     */
-    //for client detail display
-    @GetMapping(value = "listAssociatedContacts")
-    public List<Person> listAssociatedContacts(@RequestParam Integer clientId) { return personService.listAssociatedContacts(clientId);}
-
-    /**
-     * Sends all list of people who have not been assigned a client.
-     *
-     * @return list of people
-     */
-    //for client edit form
-    @GetMapping(value = "listUnassociatedContacts")
-    public List<Person> listUnassociatedContacts() { return personService.listUnassociatedContacts();}
-
-    /**
-     * Sends all list of people.
-     *
-     * @return list of people
-     */
-    //for person edit form
-    @PutMapping(value="addClientToPerson")
-    public int addClientToPerson(@RequestParam Integer personId, @RequestParam Integer clientId) { return personService.addClientToPerson(personId, clientId);}
-
-    /**
-     * Sends all list of people.
-     *
-     * @return list of people
-     */
-    @PutMapping(value="deleteAssociatedClient")
-    public int deleteAssociatedClient(@RequestParam Integer personId) { return personService.deleteAssociatedClient(personId);}
 
     /**
      * Validates and saves a new person.
      * On success, the person name is sent.
-     * On failure, the validation errors are sent.
+     * On failure, the error code sent.
      *
      * @param person populated form bean for the person
-     * @return person name as a single-element list to check in frontend.
+     * @return ResponseEntity with HttpStatus and body
      */
     @PostMapping(value = "create")
     public ResponseEntity<List<String>> create(@RequestBody Person person) {
@@ -94,10 +59,10 @@ public class PersonController {
     /**
      * Validates and saves an edited person.
      * On success, the person name is sent
-     * On failure, the validation errors are sent
+     * On failure, the error code is sent
      *
      * @param person populated form bean for the person
-     * @return person name as a single-element list to check in frontend.
+     * @return ResponseEntity with HttpStatus and body
      */
     @PutMapping(value = "edit")
     public ResponseEntity<List<String>> edit(@RequestBody Person person) {
@@ -114,9 +79,11 @@ public class PersonController {
 
     /**
      * Handles person deletion
+     * On success, true and success code is sent
+     * On failure, false and error code is sent
      *
      * @param personId the ID of the person to be deleted
-     * @return true if success, else false
+     * @return ResponseEntity with HttpStatus and body
      */
     @DeleteMapping(value = "delete")
     public ResponseEntity<Boolean> delete(@RequestParam Integer personId) {
@@ -129,6 +96,30 @@ public class PersonController {
         }
     }
 
+    /**
+     * Sends all list of people for a client.
+     *
+     * @param clientId of the client associated with the contacts to retrieve
+     * @return list of people object
+     */
+    @GetMapping(value = "listAssociatedContacts")
+    public List<Person> listAssociatedContacts(@RequestParam Integer clientId) { return personService.listAssociatedContacts(clientId);}
+
+    /**
+     * Sends all list of people who have not been assigned a client.
+     *
+     * @return list of people object
+     */
+    @GetMapping(value = "listUnassociatedContacts")
+    public List<Person> listUnassociatedContacts() { return personService.listUnassociatedContacts();}
+
+
+    /**
+     * Sends a list of persons whose email address match the given search string.
+     *
+     * @param searchText the string to lookup
+     * @return list of Person objects
+     */
     @GetMapping("/search")
     public List<Person> searchByEmail(@RequestParam String searchText) {
         return personService.findByEmail(searchText);

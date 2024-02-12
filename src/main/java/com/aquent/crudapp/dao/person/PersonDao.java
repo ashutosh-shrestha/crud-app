@@ -12,7 +12,7 @@ import java.util.List;
 public interface PersonDao {
 
     /**
-     * Retrieves all of the person records.
+     * Retrieves all person records.
      *
      * @return list of person records
      */
@@ -22,7 +22,7 @@ public interface PersonDao {
      * Creates a new person record.
      *
      * @param person the values to save
-     * @return the new person ID
+     * @return the id of new person
      */
     Integer createPerson(Person person);
 
@@ -37,46 +37,38 @@ public interface PersonDao {
     /**
      * Updates an existing person record.
      *
-     * @param person the new values to save
+     * @param person object with the new values to save
      */
     void updatePerson(Person person);
 
     /**
      * Deletes a person record by ID.
      *
-     * @param id the person ID
+     * @param id of the person
      */
     void deletePerson(Integer id);
 
 
     /**
-     * lists all associated persons given a clientid
+     * lists all associated persons given a client
      *
-     * @param - list of persons
+     * @param - List of Person objects
      */
     List<Person> listAssociatedContacts(Integer clientId);
 
     /**
      * list all persons who are unassociated with in any company
      *
-     * @param - list of persons
+     * @param - List of Person objects
      */
     List<Person> listUnassociatedContacts();
 
     /**
-     * associates a client to a person
+     * Sends a list of persons whose email address match the given search string.
      *
-     * @param - id of the client and person to be associated
+     * @param searchText the string to lookup
+     * @return list of Person objects
      */
-    int addClientToPerson(Integer personId, Integer clientId);
-
-    /**
-     * deletes a client association from a person
-     *
-     * @param - id of the person to be disassociated from their respective client
-     */
-    int deleteAssociatedClient(Integer personId);
-
     List<Person> findByEmail(String searchText);
 
 }

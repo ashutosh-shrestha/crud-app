@@ -66,6 +66,17 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
     }
 
     @Override
+    public List<String> validateClient(Client client) {
+        Set<ConstraintViolation<Client>> violations = validator.validate(client);
+        List<String> errors = new ArrayList<>(violations.size());
+        for (ConstraintViolation<Client> violation : violations) {
+            errors.add(violation.getMessage());
+        }
+        Collections.sort(errors);
+        return errors;
+    }
+
+    @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public void addContactToClient(List<Integer> addContactList, Integer clientId){
         for (int i = 0; i < addContactList.size(); i++){
@@ -87,14 +98,4 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
         return clientDao.findByName(searchText);
     }
 
-    @Override
-    public List<String> validateClient(Client client) {
-        Set<ConstraintViolation<Client>> violations = validator.validate(client);
-        List<String> errors = new ArrayList<>(violations.size());
-        for (ConstraintViolation<Client> violation : violations) {
-            errors.add(violation.getMessage());
-        }
-        Collections.sort(errors);
-        return errors;
-    }
 }

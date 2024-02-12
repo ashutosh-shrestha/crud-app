@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
  */
 
 public class Client {
+
     private Integer clientId;
 
     @NotNull

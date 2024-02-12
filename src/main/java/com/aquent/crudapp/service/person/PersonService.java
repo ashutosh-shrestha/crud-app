@@ -12,7 +12,7 @@ import java.util.List;
 public interface PersonService {
 
     /**
-     * Retrieves all of the person records.
+     * Retrieves all person records.
      *
      * @return list of person records
      */
@@ -62,9 +62,10 @@ public interface PersonService {
 
     List<Person> listUnassociatedContacts();
 
-    int addClientToPerson(Integer personId, Integer clientId);
-
-    int deleteAssociatedClient(Integer personId);
-
+    /**
+     * Sends a list of person whose email match the given search string.
+     *
+     * @return List of Person objects
+     */
     List<Person> findByEmail(String searchText);
 }
