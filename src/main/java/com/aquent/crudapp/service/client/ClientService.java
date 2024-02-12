@@ -1,9 +1,6 @@
 package com.aquent.crudapp.service.client;
 
-import com.aquent.crudapp.dto.AddContactData;
-import com.aquent.crudapp.dto.DeleteContactData;
 import com.aquent.crudapp.model.client.Client;
-import com.aquent.crudapp.model.person.Person;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -71,4 +68,7 @@ public interface ClientService {
     void addContactToClient(List<Integer> addContactData, Integer clientId);
 
     void deleteContactFromClient(List<Integer> deleteContactData);
+
+    List<Client> findByName(String searchText);
+
 }

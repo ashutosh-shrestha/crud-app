@@ -1,7 +1,5 @@
 package com.aquent.crudapp.controller.client;
 
-import com.aquent.crudapp.dto.AddContactData;
-import com.aquent.crudapp.dto.DeleteContactData;
 import com.aquent.crudapp.dto.client.ClientDto;
 import com.aquent.crudapp.model.client.Client;
 import com.aquent.crudapp.service.client.ClientService;
@@ -148,6 +146,11 @@ public class ClientController {
         catch(NoSuchElementException exp) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
+    }
+
+    @GetMapping("/search")
+    public List<Client> searchByName(@RequestParam String searchText) {
+        return clientService.findByName(searchText);
     }
 }
 

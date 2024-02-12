@@ -76,4 +76,7 @@ public interface PersonDao {
      * @param - id of the person to be disassociated from their respective client
      */
     int deleteAssociatedClient(Integer personId);
+
+    List<Person> findByEmail(String searchText);
+
 }

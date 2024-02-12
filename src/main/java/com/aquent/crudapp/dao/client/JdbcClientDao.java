@@ -1,8 +1,6 @@
 package com.aquent.crudapp.dao.client;
 
-import com.aquent.crudapp.dao.person.JdbcPersonDao;
 import com.aquent.crudapp.model.client.Client;
-import com.aquent.crudapp.model.person.Person;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -64,6 +62,9 @@ public class JdbcClientDao implements ClientDao{
             "SELECT * FROM client " +
                     "WHERE client_id = :clientId";
 
+    private static final String SQL_FIND_CLIENT_BY_NAME =
+            "SELECT * FROM client " +
+                    "WHERE UPPER(client_name) LIKE UPPER(:searchText)";
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public JdbcClientDao(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -83,7 +84,7 @@ public class JdbcClientDao implements ClientDao{
         return namedParameterJdbcTemplate.queryForObject(SQL_GET_CLIENT_NAME, Collections.singletonMap("clientId", clientId), new ClientRowMapper());
     }
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createClient(Client client) {
         int newId = -1;
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -101,13 +102,13 @@ public class JdbcClientDao implements ClientDao{
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updateClient(Client client) {
         namedParameterJdbcTemplate.update(SQL_UPDATE_CLIENT, new BeanPropertySqlParameterSource(client));
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteClient(Integer clientId) {
         //Possible to make a join statement? See later
         namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON_ON_DELETE, Collections.singletonMap("clientId", clientId));
@@ -116,7 +117,7 @@ public class JdbcClientDao implements ClientDao{
 
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int addContactToClient(Integer contactId, Integer clientId) {
         Map mapper = new HashMap();
         mapper.put("contactId", contactId);
@@ -125,10 +126,17 @@ public class JdbcClientDao implements ClientDao{
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int deleteContactFromClient(Integer contactId) {
         return namedParameterJdbcTemplate.update(SQL_DELETE_CONTACT_FROM_CLIENT, Collections.singletonMap("contactId", contactId));
     }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Client> findByName(String searchText) {
+        return namedParameterJdbcTemplate.query(SQL_FIND_CLIENT_BY_NAME, Collections.singletonMap("searchText", "%"+searchText+"%"), new ClientRowMapper());
+    }
+
 
 
     /**

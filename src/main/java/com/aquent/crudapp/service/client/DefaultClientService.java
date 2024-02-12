@@ -1,10 +1,7 @@
 package com.aquent.crudapp.service.client;
 
 import com.aquent.crudapp.dao.client.ClientDao;
-import com.aquent.crudapp.dto.AddContactData;
-import com.aquent.crudapp.dto.DeleteContactData;
 import com.aquent.crudapp.model.client.Client;
-import com.aquent.crudapp.model.person.Person;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +41,7 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
 
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createClient(Client client) {
         return clientDao.createClient(client);
     }
@@ -56,7 +53,7 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updateClient(Client client) {
         clientDao.updateClient(client);
     }
@@ -69,7 +66,7 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void addContactToClient(List<Integer> addContactList, Integer clientId){
         for (int i = 0; i < addContactList.size(); i++){
             clientDao.addContactToClient(addContactList.get(i), clientId);
@@ -77,11 +74,17 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteContactFromClient(List<Integer> deleteContactList){
         for (int i = 0; i < deleteContactList.size(); i++){
             clientDao.deleteContactFromClient(deleteContactList.get(i));
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Client> findByName(String searchText) {
+        return clientDao.findByName(searchText);
     }
 
     @Override

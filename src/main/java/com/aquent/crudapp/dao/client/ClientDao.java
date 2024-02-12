@@ -1,7 +1,6 @@
 package com.aquent.crudapp.dao.client;
 
 import com.aquent.crudapp.model.client.Client;
-import com.aquent.crudapp.model.person.Person;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -70,4 +69,7 @@ public interface ClientDao {
      * @param - id of the person to be disassociated from their respective client
      */
     int deleteContactFromClient(Integer contactId);
+
+    List<Client> findByName(String searchText);
+
 }

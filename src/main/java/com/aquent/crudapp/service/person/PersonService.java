@@ -58,7 +58,6 @@ public interface PersonService {
     List<String> validatePerson(Person person);
 
 
-
     List<Person> listAssociatedContacts(Integer clientId);
 
     List<Person> listUnassociatedContacts();
@@ -66,4 +65,6 @@ public interface PersonService {
     int addClientToPerson(Integer personId, Integer clientId);
 
     int deleteAssociatedClient(Integer personId);
+
+    List<Person> findByEmail(String searchText);
 }

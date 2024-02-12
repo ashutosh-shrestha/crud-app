@@ -2,7 +2,6 @@ package com.aquent.crudapp.service.person;
 
 import com.aquent.crudapp.dao.person.PersonDao;
 import com.aquent.crudapp.model.person.Person;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,19 +40,19 @@ public class DefaultPersonService implements PersonService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createPerson(Person person) {
         return personDao.createPerson(person);
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updatePerson(Person person) {
         personDao.updatePerson(person);
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deletePerson(Integer id) {
         personDao.deletePerson(id);
     }
@@ -81,7 +80,7 @@ public class DefaultPersonService implements PersonService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int addClientToPerson(Integer personId, Integer clientId) {
         return personDao.addClientToPerson(personId, clientId);
     }
@@ -92,4 +91,9 @@ public class DefaultPersonService implements PersonService {
         return personDao.deleteAssociatedClient(personId);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Person> findByEmail(String searchText) {
+        return personDao.findByEmail(searchText);
+    }
 }

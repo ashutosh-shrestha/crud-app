@@ -128,4 +128,9 @@ public class PersonController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
     }
+
+    @GetMapping("/search")
+    public List<Person> searchByEmail(@RequestParam String searchText) {
+        return personService.findByEmail(searchText);
+    }
 }

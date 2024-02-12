@@ -58,10 +58,13 @@ public class JdbcPersonDao implements PersonDao {
             "UPDATE person " +
                     "SET client_id = :clientId WHERE person_id = :personId";
 
-    public static final String SQL_DELETE_CLIENT_FROM_PERSON=
+    public static final String SQL_DELETE_CLIENT_FROM_PERSON =
             "UPDATE person " +
                     "SET client_id = NULL WHERE person_id = :personId";
 
+    public static final String SQL_FIND_PERSON_BY_EMAIL =
+            "SELECT * FROM person " +
+                    "WHERE email_address LIKE :searchText";
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public JdbcPersonDao(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -81,19 +84,19 @@ public class JdbcPersonDao implements PersonDao {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deletePerson(Integer personId) {
         namedParameterJdbcTemplate.update(SQL_DELETE_PERSON, Collections.singletonMap("personId", personId));
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updatePerson(Person person) {
         namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON, new BeanPropertySqlParameterSource(person));
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createPerson(Person person) {
         int newId = -1;
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -120,7 +123,7 @@ public class JdbcPersonDao implements PersonDao {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int addClientToPerson(Integer personId, Integer clientId) {
         Map mapper = new HashMap();
         mapper.put("personId", personId);
@@ -129,9 +132,15 @@ public class JdbcPersonDao implements PersonDao {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int deleteAssociatedClient(Integer personId) {
         return namedParameterJdbcTemplate.update(SQL_DELETE_CLIENT_FROM_PERSON, Collections.singletonMap("personId", personId));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Person> findByEmail(String searchText) {
+        return namedParameterJdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, Collections.singletonMap("searchText", "%"+searchText+"%"), new PersonRowMapper());
     }
 
     /**
