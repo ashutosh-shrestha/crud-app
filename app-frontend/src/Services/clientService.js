@@ -8,7 +8,7 @@ const ADD_CLIENT = baseURL + 'client/create';
 const EDIT_CLIENT = baseURL + 'client/edit';
 const DELETE_CLIENT = baseURL + 'client/delete';
 const GET_ASSOCIATED_CLIENT_NAME = baseURL + 'client/getAssociatedClient';
-
+const GET_CLIENT_LIST_BY_NAME = baseURL + 'client/search';
 
 class ClientService {
 
@@ -54,6 +54,10 @@ class ClientService {
 
     getAssociatedClient(clientId){
         return axios.get(GET_ASSOCIATED_CLIENT_NAME + "?clientId=" + clientId);
+    }
+
+    getClientListByName(searchText){
+        return axios.get(GET_CLIENT_LIST_BY_NAME + "?searchText=" + searchText);
     }
 
 }

@@ -3,7 +3,7 @@ import ContactService from "../../Services/contactService";
 import ClientService from "../../Services/clientService";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { Container, Table, Button, Form, Row, Col, Alert, Modal } from 'react-bootstrap';
+import { Container, Table, Button, Form, Row, Col, InputGroup, Alert, Modal } from 'react-bootstrap';
 import { stateCityData } from '../../StateCities';
 
 
@@ -74,6 +74,10 @@ export default function Contact(){
     //delete variables
     const [errorMessageOnDelete, setErrorMessageOnDelete] = React.useState('');
     const [deleteFailed, setDeleteFailed] = React.useState(false);
+
+
+    const [searchText, setSearchText] = useState('');
+
 
     /* ===== COMPONENT CRUD EVENT HANDLERS ===== */
 
@@ -193,6 +197,24 @@ export default function Contact(){
             });
     };
 
+
+    const handleSearchInputChange = (e) => {
+        setSearchText(e.target.value);
+      };
+    
+      const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        ContactService.getContactListByEmail(searchText)
+            .then(function (response) {
+                setContactList(response.data);
+            })  
+            .catch(function (error) {
+                console.log(error);
+                setContactListLoaded(false);
+                setContactListLoadErrorMessage("Error retrieving search contacts data.");
+            })
+      };
+
     /* ===== FETCH ON LOAD AND STATE VARIABLE (clientListUpdated) UPDATE ===== */
 
     useEffect(()=>{
@@ -264,6 +286,20 @@ export default function Contact(){
             }
 
             {/* ===== COMPONENT VIEWS ===== */}
+
+            <Form onSubmit={handleSearchSubmit}>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        placeholder="Search by email..."
+                        aria-label="Search"
+                        value={searchText}
+                        onChange={handleSearchInputChange}
+                    />
+                    <Button variant="outline-secondary" type="submit">
+                        Search
+                    </Button>
+                </InputGroup>
+            </Form>
 
             {/* contact detail view */} 
             <Modal show={viewContact} onHide={handleHideContact}>

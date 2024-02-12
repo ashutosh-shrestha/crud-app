@@ -9,6 +9,7 @@ const EDIT_CONTACT = baseURL + 'person/edit';
 const DELETE_CONTACT = baseURL + 'person/delete';
 const GET_ASSOCIATED_CONTACT = baseURL + 'person/listAssociatedContacts';
 const GET_UNASSOCIATED_CONTACT_LIST = baseURL + 'person/listUnassociatedContacts';
+const GET_CONTACT_LIST_BY_EMAIL = baseURL + 'person/search';
 
 class ContactSerivce {
 
@@ -53,6 +54,10 @@ class ContactSerivce {
 
     getUnassociatedContacts(){
         return axios.get(GET_UNASSOCIATED_CONTACT_LIST);
+    }
+
+    getContactListByEmail(searchText){
+        return axios.get(GET_CONTACT_LIST_BY_EMAIL + "?searchText=" + searchText);
     }
 }
 

@@ -7,7 +7,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated';
 
-import { Container, Table, Button, Form, Row, Col, ListGroup, Modal, Alert } from 'react-bootstrap';
+import { Container, Table, Button, Form, Row, Col, InputGroup, ListGroup, Modal, Alert } from 'react-bootstrap';
 
 export default function Client(){
 
@@ -90,6 +90,8 @@ export default function Client(){
     const [errorMessageOnDelete, setErrorMessageOnDelete] = React.useState('');
     const [deleteFailed, setDeleteFailed] = React.useState(false);
 
+
+    const [searchText, setSearchText] = useState('');
 
     /* ===== COMPONENT CRUD EVENT HANDLERS ===== */
 
@@ -251,6 +253,24 @@ export default function Client(){
               ]
             });
     };
+
+
+    const handleSearchInputChange = (e) => {
+        setSearchText(e.target.value);
+      };
+    
+      const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        ClientService.getClientListByName(searchText)
+            .then(function (response) {
+                setClientList(response.data);
+            })  
+            .catch(function (error) {
+                console.log(error);
+                setClientListLoaded(false);
+                setClientListLoadErrorMessage("Error retrieving search client data.");
+            })
+      };
     
     /* ===== FETCH ON LOAD AND STATE VARIABLE (clientListUpdated) UPDATE ===== */
 
@@ -325,6 +345,20 @@ export default function Client(){
             }
 
             {/* ===== COMPONENT VIEWS ===== */}
+
+            <Form onSubmit={handleSearchSubmit}>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        placeholder="Search by email..."
+                        aria-label="Search"
+                        value={searchText}
+                        onChange={handleSearchInputChange}
+                    />
+                    <Button variant="outline-secondary" type="submit">
+                        Search
+                    </Button>
+                </InputGroup>
+            </Form>
 
             {/* client detail view */} 
             <Modal show={viewClient} onHide={handleHideClient}>
@@ -575,12 +609,12 @@ export default function Client(){
             )}   
 
             {/* client list table view */}   
-            <Row className="mb-4">
+            <Row className="mb-4" >
                 <Col>
                     <Button variant="primary" onClick={handleShowAddForm}>
                         New Entry
                     </Button>
-                    <Table striped bordered hover className="mt-4">
+                    <Table striped bordered className="mt-4">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -588,21 +622,21 @@ export default function Client(){
                                 <th className="text-center">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {Object.keys(clientList).length !== 0? Object.values(clientList).map((client, index) => {
-                                return (
-                                    <tr key={index}>
-                                    <td>{client['name']}</td>
-                                    <td>{client['phone']}</td>
-                                    <td className="text-center">
-                                        <Button variant="info" onClick={() => handleShowClient(client)}>View</Button>{' '}
-                                        <Button variant="secondary" onClick={() => handleShowEditForm(client)}>Edit</Button>{' '}
-                                        <Button variant="danger" onClick={() => handleDeleteClient(client.clientId)}>Delete</Button>    
-                                    </td>
-                                    </tr>
-                                );
-                            }): null}
-                        </tbody>
+                            <tbody >
+                                {Object.keys(clientList).length !== 0? Object.values(clientList).map((client, index) => {
+                                    return (
+                                        <tr key={index}>
+                                        <td>{client['name']}</td>
+                                        <td>{client['phone']}</td>
+                                        <td className="text-center">
+                                            <Button variant="info" onClick={() => handleShowClient(client)}>View</Button>{' '}
+                                            <Button variant="secondary" onClick={() => handleShowEditForm(client)}>Edit</Button>{' '}
+                                            <Button variant="danger" onClick={() => handleDeleteClient(client.clientId)}>Delete</Button>    
+                                        </td>
+                                        </tr>
+                                    );
+                                }): null}
+                            </tbody>
                     </Table>
                 </Col>
             </Row>
