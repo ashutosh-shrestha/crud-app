@@ -1,15 +1,18 @@
-package com.aquent.crudapp.person;
+package com.aquent.crudapp.service.person;
 
+import com.aquent.crudapp.dao.person.PersonDao;
+import com.aquent.crudapp.model.person.Person;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Default implementation of {@link PersonService}.
@@ -27,7 +30,7 @@ public class DefaultPersonService implements PersonService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public List<Person> listPeople() {
+    public List<Person> listPerson() {
         return personDao.listPeople();
     }
 
@@ -65,4 +68,28 @@ public class DefaultPersonService implements PersonService {
         Collections.sort(errors);
         return errors;
     }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Person> listAssociatedContacts(Integer clientId) {
+        return personDao.listAssociatedContacts(clientId);
+    }
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Person> listUnassociatedContacts() {
+        return personDao.listUnassociatedContacts();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    public int addClientToPerson(Integer personId, Integer clientId) {
+        return personDao.addClientToPerson(personId, clientId);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = false)
+    public int deleteAssociatedClient(Integer personId) {
+        return personDao.deleteAssociatedClient(personId);
+    }
+
 }
