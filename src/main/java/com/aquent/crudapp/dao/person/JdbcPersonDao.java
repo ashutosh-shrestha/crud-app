@@ -75,7 +75,6 @@ public class JdbcPersonDao implements PersonDao {
             namedParameterJdbcTemplate.update(SQL_CREATE_PERSON, new BeanPropertySqlParameterSource(person), keyHolder);
             return keyHolder.getKey().intValue();
         } catch (DataIntegrityViolationException e) {
-            // Optionally, inspect the exception or its cause to tailor the message
             throw new DataIntegrityViolationException("Entity already exists");
         }
     }
@@ -93,7 +92,6 @@ public class JdbcPersonDao implements PersonDao {
         try {
             namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON, new BeanPropertySqlParameterSource(person));
         } catch (DataIntegrityViolationException e) {
-            // Optionally, inspect the exception or its cause to tailor the message
             throw new DataIntegrityViolationException("Entity already exists");
         }
     }

@@ -86,7 +86,6 @@ public class JdbcClientDao implements ClientDao{
             namedParameterJdbcTemplate.update(SQL_CREATE_CLIENT, new BeanPropertySqlParameterSource(client), keyHolder);
             return keyHolder.getKey().intValue();
         } catch (DataIntegrityViolationException e) {
-            // Optionally, inspect the exception or its cause to tailor the message
             throw new DataIntegrityViolationException("Entity already exists");
         }
     }
@@ -103,7 +102,6 @@ public class JdbcClientDao implements ClientDao{
         try {
             namedParameterJdbcTemplate.update(SQL_UPDATE_CLIENT, new BeanPropertySqlParameterSource(client));
         } catch (DataIntegrityViolationException e) {
-            // Optionally, inspect the exception or its cause to tailor the message
             throw new DataIntegrityViolationException("Entity already exists");
         }
     }
@@ -111,7 +109,6 @@ public class JdbcClientDao implements ClientDao{
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteClient(Integer clientId) {
-        //Possible to make a join statement? See later
         namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON_ON_DELETE, Collections.singletonMap("clientId", clientId));
         namedParameterJdbcTemplate.update(SQL_DELETE_CLIENT, Collections.singletonMap("clientId", clientId));
     }
