@@ -1,6 +1,7 @@
 package com.aquent.crudapp.dao.client;
 
 import com.aquent.crudapp.model.client.Client;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -80,13 +81,14 @@ public class JdbcClientDao implements ClientDao{
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createClient(Client client) {
-        int newId = -1;
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        namedParameterJdbcTemplate.update(SQL_CREATE_CLIENT, new BeanPropertySqlParameterSource(client), keyHolder);
-        if (keyHolder.getKeys().size() > 1) {
-            newId = (Integer)keyHolder.getKeys().get("client_id");
+        try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            namedParameterJdbcTemplate.update(SQL_CREATE_CLIENT, new BeanPropertySqlParameterSource(client), keyHolder);
+            return keyHolder.getKey().intValue();
+        } catch (DataIntegrityViolationException e) {
+            // Optionally, inspect the exception or its cause to tailor the message
+            throw new DataIntegrityViolationException("Entity already exists");
         }
-        return newId;
     }
 
     @Override
@@ -98,7 +100,12 @@ public class JdbcClientDao implements ClientDao{
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public void updateClient(Client client) {
-        namedParameterJdbcTemplate.update(SQL_UPDATE_CLIENT, new BeanPropertySqlParameterSource(client));
+        try {
+            namedParameterJdbcTemplate.update(SQL_UPDATE_CLIENT, new BeanPropertySqlParameterSource(client));
+        } catch (DataIntegrityViolationException e) {
+            // Optionally, inspect the exception or its cause to tailor the message
+            throw new DataIntegrityViolationException("Entity already exists");
+        }
     }
 
     @Override

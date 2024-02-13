@@ -98,6 +98,7 @@ export default function Client(){
 
     // add handlers
     const handleShowAddForm = () => {
+        console.log(addClientValues);
         setShowAddForm(true);
         setShowEditForm(false);
     }
@@ -118,6 +119,8 @@ export default function Client(){
 
     const handleAddClient = (e) =>{
         e.preventDefault();
+        setClientListUpdated(false);
+        clearFormValidationMessages();
 
         setValidationErrorOnAdd('');
         if(validatePhone(addClientValues.phone) && validateZipCode(addClientValues.zip)){
@@ -125,11 +128,12 @@ export default function Client(){
             .then((response)=>{
                     setClientListUpdated(true);
                     setShowAddForm(false);
+                    setAddClientValues(defaultAddClientValues);
                     setSuccessMessage("Client successfully added.");
                 })
                 .catch(error=>{
                     // something went wrong alert
-                    setValidationErrorOnAdd("Internal Server Error.");
+                    setValidationErrorOnAdd(error.response.data);
                     console.log(error);
                 })
         }
@@ -178,6 +182,8 @@ export default function Client(){
     const handleEditClient = (e) =>{
         e.preventDefault();
         setValidationErrorOnEdit('');
+        setClientListUpdated(false);
+        clearFormValidationMessages();
 
         if(validatePhone(editPrefill.phone) && validateZipCode(editPrefill.zipCode)){
             ClientService.editClient(editPrefill, editAddContactList, editDeleteContactList)
@@ -187,7 +193,7 @@ export default function Client(){
                     setSuccessMessage("Client successfully edited.");
                 }).catch(error=>{
                     // something went wrong alert
-                    setValidationErrorOnEdit("Internal Server Error.");
+                    setValidationErrorOnEdit(error.response.data);
                     console.log(error);
                 })
         }
@@ -216,6 +222,9 @@ export default function Client(){
 
     // delete handlers
     const handleDeleteClient = (clientId) =>{
+        setClientListUpdated(false);
+        clearFormValidationMessages();
+
         confirmAlert({
             title: 'Confirm Delete',
             message: 'Deleting a Client will also remove its association with all Contacts permanently. Are you sure that you want to delete this client?',
@@ -255,6 +264,13 @@ export default function Client(){
                 setClientListLoadErrorMessage("Error retrieving search client data.");
             })
       };
+
+    const clearFormValidationMessages = () =>{
+        setValidationErrorOnAdd('');
+        setValidationErrorOnEdit('');
+        setErrorMessageOnDelete('');
+        setSuccessMessage('');
+    }
     
     /* ===== FETCH ON LOAD AND STATE VARIABLE (clientListUpdated) UPDATE ===== */
 
@@ -268,9 +284,7 @@ export default function Client(){
                 setClientListLoaded(false);
                 setClientListLoadErrorMessage("Error retrieving client data.");
             })
-    },[clientListUpdated])
 
-    useEffect(()=>{
         let filteredData = [];
         ContactService.getUnassociatedContacts()
             .then(function (response) {
@@ -284,7 +298,6 @@ export default function Client(){
                 setClientListLoadErrorMessage("Error retrieving associated contact data.");
             })
     },[clientListUpdated])
-
     
     return(
         <Container className="mt-4"> 
@@ -339,7 +352,7 @@ export default function Client(){
                         onChange={handleSearchInputChange}
                     />
                     <Button variant="outline-secondary" type="submit">
-                        <Search/>{' '}Search
+                        <Search/>{' '}<span className="hide-on-small-screen" >Search</span>
                     </Button>
                 </InputGroup>
             </Form>

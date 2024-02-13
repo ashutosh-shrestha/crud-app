@@ -34,13 +34,6 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Client getAssociatedClient(Integer clientId) {
-        return clientDao.getAssociatedClient(clientId);
-    }
-
-
-    @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createClient(Client client) {
         return clientDao.createClient(client);
@@ -90,6 +83,12 @@ public class DefaultClientService implements com.aquent.crudapp.service.client.C
         for (int i = 0; i < deleteContactList.size(); i++){
             clientDao.deleteContactFromClient(deleteContactList.get(i));
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Client getAssociatedClient(Integer clientId) {
+        return clientDao.getAssociatedClient(clientId);
     }
 
     @Override

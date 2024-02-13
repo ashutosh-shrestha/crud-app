@@ -2,6 +2,7 @@ package com.aquent.crudapp.controller.person;
 
 import com.aquent.crudapp.model.person.Person;
 import com.aquent.crudapp.service.person.PersonService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,14 +46,18 @@ public class PersonController {
      * @return ResponseEntity with HttpStatus and body
      */
     @PostMapping(value = "create")
-    public ResponseEntity<List<String>> create(@RequestBody Person person) {
+    public ResponseEntity<List<String>> create(@RequestBody Person person) throws DataIntegrityViolationException {
         List<String> errors = personService.validatePerson(person);
-            if (errors.isEmpty()) {
+        if (errors.isEmpty()) {
+            try{
                 personService.createPerson(person);
                 List<String> successList = new ArrayList<>();
                 successList.add(person.getPersonName());
                 return ResponseEntity.status(HttpStatus.OK).body(successList);
+            }catch(DataIntegrityViolationException e){
+                errors.add("Person with this email already exists.");
             }
+        }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
         }
 
@@ -65,14 +70,15 @@ public class PersonController {
      * @return ResponseEntity with HttpStatus and body
      */
     @PutMapping(value = "edit")
-    public ResponseEntity<List<String>> edit(@RequestBody Person person) {
+    public ResponseEntity<List<String>> edit(@RequestBody Person person) throws DataIntegrityViolationException {
         List<String> errors = personService.validatePerson(person);
-
-        if (errors.isEmpty()) {
+        try{
             personService.updatePerson(person);
             List<String> successList = new ArrayList<>();
             successList.add(person.getPersonName());
             return ResponseEntity.status(HttpStatus.OK).body(successList);
+        }catch(DataIntegrityViolationException e){
+            errors.add("Person with this email already exists.");
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
     }

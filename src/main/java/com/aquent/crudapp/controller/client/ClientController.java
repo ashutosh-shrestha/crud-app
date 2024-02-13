@@ -3,6 +3,7 @@ package com.aquent.crudapp.controller.client;
 import com.aquent.crudapp.dto.client.ClientDto;
 import com.aquent.crudapp.model.client.Client;
 import com.aquent.crudapp.service.client.ClientService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,16 +50,20 @@ public class ClientController {
         Client client = clientDto.getClient();
         List<String> errors = clientService.validateClient(client);
         if(errors.isEmpty()) {
-            Integer clientId = clientService.createClient(client);
-            List<Integer> addContactData = clientDto.getAddContactList();
+            try{
+                Integer clientId = clientService.createClient(client);
+                List<Integer> addContactData = clientDto.getAddContactList();
 
-            if(!addContactData.isEmpty()){
-                clientService.addContactToClient(addContactData, clientId);
+                if(!addContactData.isEmpty()){
+                    clientService.addContactToClient(addContactData, clientId);
+                }
+
+                List<String> successList = new ArrayList<>();
+                successList.add(client.getName());
+                return ResponseEntity.status(HttpStatus.OK).body(successList);
+            }catch(DataIntegrityViolationException e){
+                errors.add("Client with this phone or website already exists");
             }
-
-            List<String> successList = new ArrayList<>();
-            successList.add(client.getName());
-            return ResponseEntity.status(HttpStatus.OK).body(successList);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
     }
@@ -75,22 +80,27 @@ public class ClientController {
     public ResponseEntity<List<String>> edit(@RequestBody ClientDto clientDto) {
         Client client = clientDto.getClient();
         List<String> errors = clientService.validateClient(client);
+
         if(errors.isEmpty()) {
-            clientService.updateClient(client);
-            List<Integer> addContactData = clientDto.getAddContactList();
-            List<Integer> deleteContactData = clientDto.getDeleteContactList();
+            try{
+                clientService.updateClient(client);
+                List<Integer> addContactData = clientDto.getAddContactList();
+                List<Integer> deleteContactData = clientDto.getDeleteContactList();
 
-            if(!addContactData.isEmpty()){
-                clientService.addContactToClient(addContactData, client.getClientId());
+                if(!addContactData.isEmpty()){
+                    clientService.addContactToClient(addContactData, client.getClientId());
+                }
+
+                if(!deleteContactData.isEmpty()){
+                    clientService.deleteContactFromClient(deleteContactData);
+                }
+
+                List<String> successList = new ArrayList<>();
+                successList.add(client.getName());
+                return ResponseEntity.status(HttpStatus.OK).body(successList);
+            }catch(DataIntegrityViolationException e){
+                errors.add("Client with this phone or website already exists");
             }
-
-            if(!deleteContactData.isEmpty()){
-                clientService.deleteContactFromClient(deleteContactData);
-            }
-
-            List<String> successList = new ArrayList<>();
-            successList.add(client.getName());
-            return ResponseEntity.status(HttpStatus.OK).body(successList);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
     }

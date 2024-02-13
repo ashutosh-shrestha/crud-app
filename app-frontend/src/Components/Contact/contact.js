@@ -24,6 +24,7 @@ export default function Contact(){
         "Zip" : "Zip code must be 5 to 9 digits.",
     }
 
+
     /* ===== COMPONENT STATE VARIABLES ===== */
 
     const [contactList, setContactList] = React.useState([]);
@@ -98,19 +99,20 @@ export default function Contact(){
 
     const handleAddContact = (e) =>{
         e.preventDefault();
-        setValidationErrorOnAdd('');
+        setContactListUpdated(false);
+        clearFormValidationMessages();
 
         if(validateZipCode(addContactValues.zip)){
             ContactService.addContact(addContactValues)
             .then((response)=>{
                     setContactListUpdated(true);
                     setShowAddForm(false);
-                    setAddContactValues([]);
+                    setAddContactValues(defaultAddContactValues);
                     setSuccessMessage("Contact successfully added.");
                 })
                 .catch(error=>{
                     // something went wrong alert
-                    setValidationErrorOnAdd("Internal Server Error.");
+                    setValidationErrorOnAdd(error.response.data);
                     console.log(error);
                 })
         }
@@ -133,8 +135,9 @@ export default function Contact(){
 
     const handleEditContact = (e) =>{
         e.preventDefault();
+        setContactListUpdated(false);
+        clearFormValidationMessages();
 
-        setValidationErrorOnEdit('');
         if(validateZipCode(editPrefill.zipCode)){
             ContactService.editContact(editPrefill)
             .then((response)=>{
@@ -143,7 +146,7 @@ export default function Contact(){
                     setSuccessMessage("Contact successfully edited.");
                 }).catch(error=>{
                     // something went wrong alert
-                    setValidationErrorOnEdit("Internal Server Error.");
+                    setValidationErrorOnEdit(error.response.data);
                     console.log(error);
                 })
         }
@@ -167,6 +170,8 @@ export default function Contact(){
 
     // delete handlers
     const handleDeleteContact = (personId) =>{
+        setContactListUpdated(false);
+        clearFormValidationMessages();
         confirmAlert({
             title: 'Confirm Delete',
             message: 'Are you sure that you want to delete this contact?',
@@ -207,6 +212,14 @@ export default function Contact(){
             })
       };
 
+
+    const clearFormValidationMessages = () =>{
+        setValidationErrorOnAdd('');
+        setValidationErrorOnEdit('');
+        setErrorMessageOnDelete('');
+        setSuccessMessage('');
+    }
+
     /* ===== FETCH ON LOAD AND STATE VARIABLE (contactListUpdated) UPDATE ===== */
 
     useEffect(()=>{
@@ -218,10 +231,8 @@ export default function Contact(){
                 console.log(error);
                 setContactListLoaded(false);
                 setContactListLoadErrorMessage("Error retrieving contacts data.");
-            })
-    },[contactListUpdated])
+            });
 
-    useEffect(()=>{
         ClientService.getClientList()
             .then(function (response) {
                 setClientList(response.data);
@@ -231,6 +242,7 @@ export default function Contact(){
                 setContactListLoaded(false);
                 setContactListLoadErrorMessage("Error retrieving client from contact.");
             })
+        
     },[contactListUpdated])
 
     return(
@@ -287,7 +299,7 @@ export default function Contact(){
                         onChange={handleSearchInputChange}
                     />
                     <Button variant="outline-secondary" type="submit">
-                        <Search/> {' '}Search
+                        <Search/> {' '}<span className="hide-on-small-screen">Search</span>
                     </Button>
                 </InputGroup>
             </Form>

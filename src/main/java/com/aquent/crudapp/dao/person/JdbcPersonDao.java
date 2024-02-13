@@ -1,6 +1,7 @@
 package com.aquent.crudapp.dao.person;
 
 import com.aquent.crudapp.model.person.Person;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -13,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Spring JDBC implementation of {@link PersonDao}.
@@ -71,13 +70,14 @@ public class JdbcPersonDao implements PersonDao {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public Integer createPerson(Person person) {
-        int newId = -1;
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        namedParameterJdbcTemplate.update(SQL_CREATE_PERSON, new BeanPropertySqlParameterSource(person), keyHolder);
-        if (keyHolder.getKeys().size() > 1) {
-            newId = (Integer) keyHolder.getKeys().get("person_id");
+        try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            namedParameterJdbcTemplate.update(SQL_CREATE_PERSON, new BeanPropertySqlParameterSource(person), keyHolder);
+            return keyHolder.getKey().intValue();
+        } catch (DataIntegrityViolationException e) {
+            // Optionally, inspect the exception or its cause to tailor the message
+            throw new DataIntegrityViolationException("Entity already exists");
         }
-        return newId;
     }
 
     @Override
@@ -90,7 +90,12 @@ public class JdbcPersonDao implements PersonDao {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
     public void updatePerson(Person person) {
-        namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON, new BeanPropertySqlParameterSource(person));
+        try {
+            namedParameterJdbcTemplate.update(SQL_UPDATE_PERSON, new BeanPropertySqlParameterSource(person));
+        } catch (DataIntegrityViolationException e) {
+            // Optionally, inspect the exception or its cause to tailor the message
+            throw new DataIntegrityViolationException("Entity already exists");
+        }
     }
 
     @Override
