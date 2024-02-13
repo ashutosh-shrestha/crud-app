@@ -156,9 +156,7 @@ export default function Client(){
             .catch(function (error) {
                 console.log(error);
             })
-            .then(function () {
-                // always executed
-            }); 
+
     }
     const handleEditInputChange = (e) => {
         setEditPrefill({
@@ -295,7 +293,7 @@ export default function Client(){
             .catch(function (error) {
                 console.log(error);
                 setClientListLoaded(false);
-                setClientListLoadErrorMessage("Error retrieving associated contact data.");
+                setClientListLoadErrorMessage("Error retrieving unassociated contact data.");
             })
     },[clientListUpdated])
     
@@ -425,7 +423,7 @@ export default function Client(){
                                 <Form.Group as={Row} className="mt-2">
                                     <Form.Label column sm={3} className="hide-on-small-screen">Website URI <span className="text-danger">*</span></Form.Label>
                                     <Col sm={6}>
-                                        <Form.Control type="url" name="website" placeholder="Website URI" value={addClientValues.website} onChange={handleAddInputChange} required/>
+                                        <Form.Control type="url" name="website" placeholder="Website URI(http://... or https://...)" value={addClientValues.website} onChange={handleAddInputChange} required/>
                                     </Col>
                                 </Form.Group>
 
