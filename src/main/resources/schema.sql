@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS person;
-
 CREATE TABLE person (
     person_id integer IDENTITY,
     client_id integer DEFAULT -1,
@@ -11,8 +9,6 @@ CREATE TABLE person (
     state varchar(2) NOT NULL,
     zip_code varchar(5) NOT NULL
 );
-
-DROP TABLE IF EXISTS client;
 
 CREATE TABLE client(
     client_id integer IDENTITY,
